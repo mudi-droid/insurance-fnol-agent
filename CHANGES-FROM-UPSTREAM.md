@@ -37,3 +37,21 @@ first.
 **Nothing else is changed.** The agent, its tools and the hardcoded DataRobot asset IDs in
 `agent/agent/myagent.py` and `fastapi_server/app/api/v1/claims.py` are untouched; they still point at
 the dataset and the two deployments in the AI Training tenant.
+
+## Verified
+
+Run end to end in a DataRobot codespace on 2026-11-20, from a fresh clone, driven entirely through
+Build Studio's Assist tab with no manual `dr start`, no manual `deploy-dev` and no hand-created
+stack:
+
+- `dev` saw `pulumi_config.json` missing and ran `infra:deploy-dev` itself
+- `ensure-stack` created the Pulumi stack
+- `pulumi up` created 8 resources in about 20s and wrote `pulumi_config.json` with the trace endpoint
+- `drdev` brought up all five services, every port returning HTTP 200
+- the agent's OTel exporter started with both auth headers; **401 count: 0** across the whole log
+- one recommendation produced a 10-span trace, 0 errors, visible in Build Studio
+
+**Known limitation.** Two checkouts of this project on one machine share a Pulumi project name and
+local state folder, so the second one keeps the default stack name and reuses the first one's stack.
+`ensure-stack` now warns when it selects a stack that already holds resources; set a unique
+`PULUMI_STACK_NAME` in that checkout's `.env` before running.

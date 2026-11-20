@@ -263,7 +263,15 @@ tasks:
       - |
         STACK="${PULUMI_STACK_NAME:-agent-application-dev}"
         if {{.UV_CMD}} run pulumi stack select "$STACK" >/dev/null 2>&1; then
-          echo "🧱 Using existing Pulumi stack: $STACK"
+          COUNT="$({{.UV_CMD}} run pulumi stack --show-urns 2>/dev/null | grep -c 'urn:pulumi:' || true)"
+          if [ "${COUNT:-0}" -gt 0 ]; then
+            echo "⚠️  Reusing Pulumi stack '$STACK', which already holds ${COUNT} resource(s)."
+            echo "   If this is a second checkout of the same project on this machine, stop and set a"
+            echo "   unique PULUMI_STACK_NAME in .env first. Otherwise deploy-dev can replace resources"
+            echo "   that belong to the other checkout."
+          else
+            echo "🧱 Using existing Pulumi stack: $STACK"
+          fi
         else
           echo "🧱 Creating Pulumi stack: $STACK"
           {{.UV_CMD}} run pulumi stack init "$STACK"
