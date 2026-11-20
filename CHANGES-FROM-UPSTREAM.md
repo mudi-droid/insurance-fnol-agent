@@ -30,9 +30,10 @@ fresh clone before any service started.
 The two misleading "Please run 'dr start' first" messages in `infra/Taskfile.yaml` now name the task
 that actually fixes it.
 
-**Still assumed:** that Pulumi is logged in. `dr start` handles that once per machine, and a
-DataRobot codespace keeps it in `~/.pulumi`. On a genuinely new machine, run `pulumi login --local`
-first.
+**The fix, part 3 — log in to a backend.** A brand-new machine or codespace has no `~/.pulumi`, so
+there is no backend for stack state and `ensure-stack` fails before it can create anything.
+`dr start` normally handles this. `ensure-stack` now checks `pulumi whoami` and falls back to
+`pulumi login --local` when there is no backend, so a first-ever checkout works without `dr start`.
 
 **Nothing else is changed.** The agent, its tools and the hardcoded DataRobot asset IDs in
 `agent/agent/myagent.py` and `fastapi_server/app/api/v1/claims.py` are untouched; they still point at

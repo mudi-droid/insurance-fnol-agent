@@ -262,6 +262,15 @@ tasks:
     cmds:
       - |
         STACK="${PULUMI_STACK_NAME:-agent-application-dev}"
+
+        # A brand-new machine or codespace has no ~/.pulumi, so there is no backend to
+        # write stack state to. dr start normally handles this; do it here too so a plain
+        # `dr run dev` works on a first-ever checkout.
+        if ! {{.UV_CMD}} run pulumi whoami >/dev/null 2>&1; then
+          echo "🔑 Pulumi is not logged in. Using the local filesystem backend."
+          {{.UV_CMD}} run pulumi login --local >/dev/null 2>&1
+        fi
+
         if {{.UV_CMD}} run pulumi stack select "$STACK" >/dev/null 2>&1; then
           COUNT="$({{.UV_CMD}} run pulumi stack --show-urns 2>/dev/null | grep -c 'urn:pulumi:' || true)"
           if [ "${COUNT:-0}" -gt 0 ]; then
