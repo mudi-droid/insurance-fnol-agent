@@ -86,7 +86,7 @@ tasks:
     cmds:
       - |
         if [ ! -f pulumi_config.json ]; then
-          echo "❌ Missing pulumi_config.json in project root. Please run 'dr start' first to setup the project."
+          echo "❌ Missing pulumi_config.json in project root. Run 'task deploy-dev' (or 'dr start') to provision it."
           exit 1
         fi
 
@@ -97,7 +97,7 @@ tasks:
         fi
 
         if [ -z "${DATAROBOT_USE_CASE_ID}" ]; then
-          echo "❌ DATAROBOT_USE_CASE_ID is missing in pulumi_config.json. Please run 'dr start' first to setup the project."
+          echo "❌ DATAROBOT_USE_CASE_ID is missing in pulumi_config.json. Run 'task deploy-dev' (or 'dr start') to provision it."
           exit 1
         fi
 

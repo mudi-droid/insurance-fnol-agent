@@ -101,6 +101,13 @@ tasks:
     deps:
       - auth-check
     cmds:
+      - |
+        if [ ! -f pulumi_config.json ]; then
+          echo "ℹ️  First run: pulumi_config.json not found."
+          echo "   Provisioning backing infrastructure so the tracing dashboard can start."
+          echo "   This happens once per project; later runs reuse it."
+          task infra:deploy-dev
+        fi
       - drdev
 
   deploy:
